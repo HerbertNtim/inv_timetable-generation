@@ -3,9 +3,11 @@
   "packageManager": "yarn@4.9.1",
   "scripts": {
     "check-rooms": "node src/check-rooms.js",
-    "timetable": "node src/timetable.js"
+    "timetable": "node src/timetable.js",
+    "rooms": "node src/rooms.js"
   },
   "dependencies": {
-    "exceljs": "^4.4.0"
+    "exceljs": "^4.4.0",
+    "xlsx": "^0.18.5"
   }
 }
