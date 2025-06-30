@@ -1,0 +1,11 @@
+{
+  "name": "second-semester",
+  "packageManager": "yarn@4.9.1",
+  "scripts": {
+    "check-rooms": "node src/check-rooms.js",
+    "timetable": "node src/timetable.js"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0"
+  }
+}
