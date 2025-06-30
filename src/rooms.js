@@ -53,8 +53,7 @@ function groupByDateAndSession(data) {
 
 const filename =
   "C:/Users/mrman/Desktop/exams/generated/Midsem_Timetable_2024-25_Midsem-cleaned.xlsx";
-const output = "C:/Users/mrman/Desktop/exams/generated/grouped_rooms.json";
-
+const output = "C:/Users/mrman/Desktop/exams/ss-mid/rooms.json";
 const groupedData = processExcel(filename);
 fs.writeFileSync(output, JSON.stringify(groupedData, null, 2));
 

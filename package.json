@@ -4,7 +4,8 @@
   "scripts": {
     "check-rooms": "node src/check-rooms.js",
     "timetable": "node src/timetable.js",
-    "rooms": "node src/rooms.js"
+    "rooms": "node src/rooms.js",
+    "generate-tas": "node src/generate-ta_list.js"
   },
   "dependencies": {
     "exceljs": "^4.4.0",
