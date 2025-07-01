@@ -1,4 +1,5 @@
 const ExamsSchedule = require("./generated/rooms-ta.json");
+const fs = require("fs");
 const TAsList = require("./generated/tas.json");
 const roomsWith2TAs = ["NEB-SF", "NEB-TF", "NEB-GF", "NAF1"];
 
@@ -21,7 +22,6 @@ function getTotalSessions(ExamsSchedule) {
     });
   });
 
-  console.log(totalSessions);
   return totalSessions;
 }
 
@@ -46,7 +46,12 @@ function getAvailableTA(
 
   if (availableTAs.length === 0) return null;
 
-  return availableTAs[Math.floor(Math.random * availableTAs.length)];
+  return availableTAs[Math.floor(Math.random() * availableTAs.length)];
+}
+
+function getRandomTa(tasList) {
+  if (!tasList.length) return null; // Return null if the list is empty
+  return tasList[Math.floor(Math.random() * tasList.length)];
 }
 
 function scheduleTas(ExamsSchedule, TAsList) {
@@ -60,7 +65,6 @@ function scheduleTas(ExamsSchedule, TAsList) {
     days.forEach((day) => {
       tasSchedule[day] = {};
       const sessions = Object.keys(ExamsSchedule[day]);
-
       const tasAssignedForSession = [];
       const availableTas = TAsList.filter(
         (ta) => tasSessionCount[ta] < maxSessionPerTa
@@ -83,6 +87,7 @@ function scheduleTas(ExamsSchedule, TAsList) {
               tasSchedule[day][session][room].push(ta1);
               tasSessionCount += 1;
               tasAssignedForSession.push(ta1);
+              console.log(tasAssignedForSession);
             } else {
               const privTa = getPrivTa(tasSessionCount, tasAssignedForSession);
               if (privTa) {
@@ -90,6 +95,14 @@ function scheduleTas(ExamsSchedule, TAsList) {
                 tasSessionCount[privTa] += 1;
                 tasAssignedForSession.push(privTa);
               }
+              // else {
+              //   const randomTa = getRandomTa(
+              //     TAsList.filter((ta) => !tasAssignedForSession.includes(ta))
+              //   );
+              //   tasSchedule[day][session][room].push(randomTa);
+              //   tasSessionCount[randomTa] += 1;
+              //   tasAssignedForSession.push(randomTa);
+              // }
             }
 
             const ta2 = getAvailableTA(
@@ -112,6 +125,14 @@ function scheduleTas(ExamsSchedule, TAsList) {
                 tasSessionCount[privTa] += 1;
                 tasAssignedForSession.push(privTa);
               }
+              // else {
+              //   const randomTa = getRandomTa(
+              //     TAsList.filter((ta) => !tasAssignedForSession.includes(ta))
+              //   );
+              //   tasSchedule[day][session][room].push(randomTa);
+              //   tasSessionCount[randomTa] += 1;
+              //   tasAssignedForSession.push(randomTa);
+              // }
             }
           } else {
             const ta = getAvailableTA(
@@ -132,6 +153,14 @@ function scheduleTas(ExamsSchedule, TAsList) {
                 tasSessionCount[privTa] += 1;
                 tasAssignedForSession.push(privTa);
               }
+              // else {
+              //   const randomTa = getRandomTa(
+              //     TAsList.filter((ta) => !tasAssignedForSession.includes(ta))
+              //   );
+              //   tasSchedule[day][session][room].push(randomTa);
+              //   tasSessionCount[randomTa] += 1;
+              //   tasAssignedForSession.push(randomTa);
+              // }
             }
           }
         });
@@ -139,15 +168,17 @@ function scheduleTas(ExamsSchedule, TAsList) {
     });
   });
 
-  console.log(tasSchedule, tasSessionCount);
+  // console.log(tasSchedule, tasSessionCount);
 
   return [tasSchedule, tasSessionCount];
 }
 
 function getPrivTa(tasSessionCount, tasAssignedForSession) {
-  const privTas = require("./generated/tas.json");
+  const privTas = require("./generated/spec.json");
   const availableTas = privTas.filter(
-    (ta) => tasSessionCount[ta] < 7 && !tasAssignedForSession.includes(ta)
+    (ta) =>
+      (tasSessionCount[ta] < 7 || tasSessionCount[ta] < 6) &&
+      !tasAssignedForSession.includes(ta)
   );
 
   if (availableTas.length === 0) return null; // No available TA found
@@ -155,5 +186,72 @@ function getPrivTa(tasSessionCount, tasAssignedForSession) {
   return availableTas[Math.floor(Math.random() * availableTas.length)];
 }
 
-const sche = scheduleTas(ExamsSchedule, TAsList);
-console.log(sche);
+const [tasSchedule, tasSessionCount] = scheduleTas(ExamsSchedule, TAsList);
+console.log(tasSchedule)
+console.log(tasSessionCount)
+
+// function saveTaScheduleToXLSX() {
+//   const tasSchedule = scheduleTas(ExamsSchedule, TAsList)
+//   console.log(tasSchedule)
+//   const ExcelJS = require("exceljs");
+
+//   const tasScheduleList = [];
+
+//   const days = Object.keys(tasSchedule);
+//   days.forEach((day) => {
+//     const sessions = Object.keys(tasSchedule[day]);
+//     console.log(ExamsSchedule[day])
+//     sessions.forEach((session) => {
+//       const rooms = Object.keys(ExamsSchedule[day][session]);
+
+//       rooms.forEach((room) => {
+//         const roomSchedule = {
+//           room,
+//           teachingAssistant: tasSchedule[day][session][room].join(" / "),
+//           date: day,
+//           session,
+//         };
+
+//         tasScheduleList.push(roomSchedule);
+//       });
+//       tasScheduleList.push([]);
+//     });
+//   });
+
+//       console.log(tasScheduleList);
+
+
+//   const wb = new ExcelJS.Workbook();
+//   const sheet1 = wb.addWorksheet("Sheet1");
+//   sheet1.columns = [
+//     { header: "Room", key: "room", width: 32 },
+//     { header: "Teaching Assistant", key: "teachingAssistant", width: 72 },
+//     { header: "Date", key: "date", width: 50 },
+//     { header: "Session", key: "session", width: 50 },
+//   ];
+//   sheet1.addRows(tasScheduleList);
+
+//   wb.xlsx
+//     .writeFile("./output/ta_schedule.xlsx")
+//     .then(() => {
+//       console.log("[+] Finished saving ta schedule");
+//     })
+//     .catch((err) => {
+//       "[-] Error saving ta schedule:\n", err;
+//     });
+
+//   fs.writeFileSync(
+//     "./output/ta_schedule_list.json",
+//     JSON.stringify(tasScheduleList)
+//   );
+// }
+
+const tas_schedules =  "./outputs/tas_schedule.json"
+const sessionCount = "./outputs/tas_session_count.json"
+fs.writeFileSync(tas_schedules, JSON.stringify(tasSchedule));
+fs.writeFileSync(
+  sessionCount,
+  JSON.stringify(tasSessionCount)
+);
+
+// saveTaScheduleToXLSX();

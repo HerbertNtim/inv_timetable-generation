@@ -7,7 +7,8 @@
     "rooms": "node src/rooms.js",
     "generate-tas": "node src/generate-ta_list.js",
     "schedule-rooms": "node src/sche_rooms.js",
-    "schedule-tas": "node src/schedule-TAs.js"
+    "schedule-tas": "node src/schedule-TAs.js",
+    "index": "node src/index.js"
   },
   "dependencies": {
     "exceljs": "^4.4.0",

@@ -54,7 +54,7 @@ function groupRoomsForAllocation(data) {
 }
 
 const filename =
-  "C:/Users/mrman/Desktop/exams/generated/Midsem_Timetable_2024-25_Midsem-cleaned.xlsx";
+  "C:/Users/mrman/Desktop/exams/generated/Midsem_Timetable_2024-25_Midsem-cleaned-new.xlsx";
 
 const output = "./src/generated/rooms-ta.json"
 
