@@ -129,7 +129,7 @@ async function start(allPapers, destPath) {
   saveWorkbookToXlsxFile(newWorkbook, destPath);
 }
 
-const filename = "C:/Users/mrman/Desktop/exams/Midsem_Timetable_2024-25_Midsem-final.xlsx";
+const filename = "C:/Users/mrman/Desktop/exams/Midsem_Timetable_2024-25_Midsem-2-final.xlsx";
 const output = "C:/Users/mrman/Desktop/exams/generated/Midsem_Timetable_2024-25_Midsem-cleaned.xlsx"
 
 cleanTimetable(filename, "Sheet1", 1010, 8)
