@@ -1,4 +1,4 @@
-const examsSchedule = require("./generated/rooms-ta.json");
+const examsSchedule = require("./generated/ta-rooms.json");
 const tasList = require("./generated/tas.json");
 const roomsWith2Tas = ["NEB-SF", "NEB-TF", "VSLA", "NAF1"];
 
@@ -21,6 +21,8 @@ function getTotalNumOfSessions(examsSchedule) {
     });
   });
 
+  console.log(totalNumOfSessions)
+
   return totalNumOfSessions;
 }
 
@@ -28,7 +30,7 @@ function getAverageSessionsPerTa(examsSchedule, tasList) {
   const totalNumOfSessions = getTotalNumOfSessions(examsSchedule);
   const numOfTas = tasList.length;
 
-  //   console.log(totalNumOfSessions / numOfTas);
+    console.log(totalNumOfSessions / numOfTas);
 
   return Math.floor(totalNumOfSessions / numOfTas);
 }
@@ -311,7 +313,7 @@ function saveTaScheduleToXLSX() {
   sheet2.addRows(tasSessionCountList);
 
   wb.xlsx
-    .writeFile("./src/outputs/ta_schedule.xlsx")
+    .writeFile("./src/outputs/ta_schedule-final.xlsx")
     .then(() => {
       console.log("[+] Finished saving ta schedule");
     })
