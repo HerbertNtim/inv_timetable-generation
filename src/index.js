@@ -245,9 +245,7 @@ function scheduleTas(examsSchedule, tasList) {
 function getPrivTa(tasSessionCount, tasAssignedForSession) {
   const privTas = require("./generated/spec.json");
   const availableTas = privTas.filter(
-    (ta) =>
-      tasSessionCount[ta] < 7 &&
-      !tasAssignedForSession.includes(ta)
+    (ta) => tasSessionCount[ta] < 6 && !tasAssignedForSession.includes(ta)
   );
 
   if (availableTas.length === 0) return null; // No available TA found
