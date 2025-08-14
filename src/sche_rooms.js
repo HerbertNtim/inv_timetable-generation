@@ -38,24 +38,23 @@ function groupRoomsForAllocation(data) {
       result[Dates][Sessions] = {};
     }
 
-    Rooms.split("/").forEach((room) =>
-    {
-      if (Object.keys(result[Dates][Sessions]).includes(room) || room.trim() === 'Computer Based') {
-        return
+    Rooms.split("/").forEach((room) => {
+      if (
+        Object.keys(result[Dates][Sessions]).includes(room) ||
+        room.trim() === "Computer Based"
+      ) {
+        return;
       }
-      result[Dates][Sessions][room] = []
-    }
-    );
+      result[Dates][Sessions][room] = [];
+    });
   });
-
-  console.log(result);
 
   return result;
 }
 
 const filename =
-  "C:/Users/mrman/Desktop/exams/generated/Midsem_Timetable_2024-25_Midsem-cleaned.xlsx";
+  "C:/Users/mrman/Desktop/second-sem/generated/Examtt2k24_25_SS_EXAMS_cleaned.xlsx";
 
-const output = "./src/generated/rooms-ta.json"
+const output = "./src/generated/rooms-ta.json";
 
 fs.writeFileSync(output, JSON.stringify(workOnExcel(filename), null, 2));

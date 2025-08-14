@@ -77,8 +77,7 @@ async function checkAllocationSchedule(timetableOutput) {
   }
 }
 
-const output =
-  "C:/Users/mrman/Desktop/exams/generated/Midsem_Timetable_2024-25_Midsem-cleaned.xlsx";
+const output = "C:/Users/mrman/Desktop/second-sem/generated/Examtt2k24_25_SS_EXAMS_cleaned.xlsx"
 
 verifyRooms(output);
 // checkAllocationSchedule(output);

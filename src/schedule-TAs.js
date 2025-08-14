@@ -22,6 +22,7 @@ function getTotalSessions(ExamsSchedule) {
     });
   });
 
+  console.log("Total Sessions: ", totalSessions)
   return totalSessions;
 }
 
@@ -29,6 +30,7 @@ function getAverageSessionsPerTa(ExamsSchedule, TAsList) {
   const totalSessions = getTotalSessions(ExamsSchedule);
   const totalTAs = TAsList.length;
 
+  console.log(Math.floor(totalSessions / totalTAs))
   return Math.floor(totalSessions / totalTAs);
 }
 
@@ -87,7 +89,7 @@ function scheduleTas(ExamsSchedule, TAsList) {
               tasSchedule[day][session][room].push(ta1);
               tasSessionCount += 1;
               tasAssignedForSession.push(ta1);
-              console.log(tasAssignedForSession);
+              // console.log(tasAssignedForSession);
             } else {
               const privTa = getPrivTa(tasSessionCount, tasAssignedForSession);
               if (privTa) {
@@ -177,7 +179,7 @@ function getPrivTa(tasSessionCount, tasAssignedForSession) {
   const privTas = require("./generated/spec.json");
   const availableTas = privTas.filter(
     (ta) =>
-      (tasSessionCount[ta] < 7 || tasSessionCount[ta] < 6) &&
+      (tasSessionCount[ta] < 6) &&
       !tasAssignedForSession.includes(ta)
   );
 
@@ -187,71 +189,71 @@ function getPrivTa(tasSessionCount, tasAssignedForSession) {
 }
 
 const [tasSchedule, tasSessionCount] = scheduleTas(ExamsSchedule, TAsList);
-console.log(tasSchedule)
-console.log(tasSessionCount)
+// console.log(tasSchedule)
+// console.log(tasSessionCount)
 
-// function saveTaScheduleToXLSX() {
-//   const tasSchedule = scheduleTas(ExamsSchedule, TAsList)
-//   console.log(tasSchedule)
-//   const ExcelJS = require("exceljs");
+function saveTaScheduleToXLSX() {
+  const tasSchedule = scheduleTas(ExamsSchedule, TAsList)
+  // console.log(tasSchedule)
+  const ExcelJS = require("exceljs");
 
-//   const tasScheduleList = [];
+  const tasScheduleList = [];
 
-//   const days = Object.keys(tasSchedule);
-//   days.forEach((day) => {
-//     const sessions = Object.keys(tasSchedule[day]);
-//     console.log(ExamsSchedule[day])
-//     sessions.forEach((session) => {
-//       const rooms = Object.keys(ExamsSchedule[day][session]);
+  const days = Object.keys(tasSchedule);
+  days.forEach((day) => {
+    const sessions = Object.keys(tasSchedule[day]);
+    // console.log(ExamsSchedule[day])
+    sessions.forEach((session) => {
+      const rooms = Object.keys(ExamsSchedule[day][session]);
 
-//       rooms.forEach((room) => {
-//         const roomSchedule = {
-//           room,
-//           teachingAssistant: tasSchedule[day][session][room].join(" / "),
-//           date: day,
-//           session,
-//         };
+      rooms.forEach((room) => {
+        const roomSchedule = {
+          room,
+          teachingAssistant: tasSchedule[day][session][room].join(" / "),
+          date: day,
+          session,
+        };
 
-//         tasScheduleList.push(roomSchedule);
-//       });
-//       tasScheduleList.push([]);
-//     });
-//   });
+        tasScheduleList.push(roomSchedule);
+      });
+      tasScheduleList.push([]);
+    });
+  });
 
-//       console.log(tasScheduleList);
+      // console.log(tasScheduleList);
 
 
-//   const wb = new ExcelJS.Workbook();
-//   const sheet1 = wb.addWorksheet("Sheet1");
-//   sheet1.columns = [
-//     { header: "Room", key: "room", width: 32 },
-//     { header: "Teaching Assistant", key: "teachingAssistant", width: 72 },
-//     { header: "Date", key: "date", width: 50 },
-//     { header: "Session", key: "session", width: 50 },
-//   ];
-//   sheet1.addRows(tasScheduleList);
+  const wb = new ExcelJS.Workbook();
+  const sheet1 = wb.addWorksheet("Sheet1");
+  sheet1.columns = [
+    { header: "Room", key: "room", width: 32 },
+    { header: "Teaching Assistant", key: "teachingAssistant", width: 72 },
+    { header: "Date", key: "date", width: 50 },
+    { header: "Session", key: "session", width: 50 },
+  ];
+  sheet1.addRows(tasScheduleList);
 
-//   wb.xlsx
-//     .writeFile("./output/ta_schedule.xlsx")
-//     .then(() => {
-//       console.log("[+] Finished saving ta schedule");
-//     })
-//     .catch((err) => {
-//       "[-] Error saving ta schedule:\n", err;
-//     });
+  wb.xlsx
+    .writeFile("./output/ta_schedule.xlsx")
+    .then(() => {
+      console.log("[+] Finished saving ta schedule");
+    })
+    .catch((err) => {
+      "[-] Error saving ta schedule:\n", err;
+    });
 
-//   fs.writeFileSync(
-//     "./output/ta_schedule_list.json",
-//     JSON.stringify(tasScheduleList)
-//   );
-// }
+  fs.writeFileSync(
+    "./output/ta_schedule_list.json",
+    JSON.stringify(tasScheduleList)
+  );
+}
 
-const tas_schedules =  "./outputs/tas_schedule.json"
-const sessionCount = "./outputs/tas_session_count.json"
-fs.writeFileSync(tas_schedules, JSON.stringify(tasSchedule));
-fs.writeFileSync(
-  sessionCount,
-  JSON.stringify(tasSessionCount)
-);
+// const tas_schedules =  "./outputs/tas_schedule.json"
+// const sessionCount = "./outputs/tas_session_count.json"
+// fs.writeFileSync(tas_schedules, JSON.stringify(tasSchedule));
+// fs.writeFileSync(
+//   sessionCount,
+//   JSON.stringify(tasSessionCount)
+// );
 
-// saveTaScheduleToXLSX();
+saveTaScheduleToXLSX();

@@ -129,8 +129,8 @@ async function start(allPapers, destPath) {
   saveWorkbookToXlsxFile(newWorkbook, destPath);
 }
 
-const filename = "C:/Users/mrman/Desktop/exams/Midsem_Timetable_2024-25_Midsem-2-final.xlsx";
-const output = "C:/Users/mrman/Desktop/exams/generated/Midsem_Timetable_2024-25_Midsem-cleaned.xlsx"
+const filename = "C:/Users/mrman/Desktop/second-sem/Examtt2k24_25_SS_EXAMS.xlsx";
+const output = "C:/Users/mrman/Desktop/second-sem/generated/Examtt2k24_25_SS_EXAMS-cleaned.xlsx"
 
 cleanTimetable(filename, "Sheet1", 1010, 8)
   .then((allPapers) => {

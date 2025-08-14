@@ -9,7 +9,8 @@
     "schedule-rooms": "node src/sche_rooms.js",
     "schedule-tas": "node src/schedule-TAs.js",
     "index": "node src/index.js",
-    "new": "node src/new.js"
+    "new": "node src/new.js",
+    "final": "node src/final.js"
   },
   "dependencies": {
     "exceljs": "^4.4.0",

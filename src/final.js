@@ -1,9 +1,10 @@
 const examsSchedule = require("./generated/rooms-ta.json");
+const fs = require("fs");
 const tasList = require("./generated/tas.json");
-const roomsWith2Tas = ["NEB-SF", "NEB-TF", "NEB-GF", "NAF1", "VSLA"];
+const roomsWith2Tas = ["NEB-SF", "NEB-TF", "NAF1", "VSLA"];
 
-function getTotalNumOfSessions(examsSchedule) {
-  let totalNumOfSessions = 0;
+function totalSessions(examsSchedule) {
+  let totalSessions = 0;
 
   const days = Object.keys(examsSchedule);
   days.forEach((day) => {
@@ -13,19 +14,20 @@ function getTotalNumOfSessions(examsSchedule) {
 
       rooms.forEach((room) => {
         if (roomsWith2Tas.includes(room)) {
-          totalNumOfSessions += 2;
+          totalSessions += 2;
         } else {
-          totalNumOfSessions += 1;
+          totalSessions += 1;
         }
       });
     });
   });
 
-  return totalNumOfSessions;
+  console.log(totalSessions);
+  return totalSessions;
 }
 
 function getAverageSessionsPerTa(examsSchedule, tasList) {
-  const totalNumOfSessions = getTotalNumOfSessions(examsSchedule);
+  const totalNumOfSessions = totalSessions(examsSchedule);
   const numOfTas = tasList.length;
 
   console.log("total-sessions", totalNumOfSessions);
@@ -61,9 +63,10 @@ function getPrivTa(tasSessionCount, tasAssignedForSession, maxSessionsPerTa) {
   const privTas = require("./generated/spec.json");
   // Use the same max sessions as regular TAs, or allow slightly more flexibility
   const maxForPrivTas = maxSessionsPerTa + 1; // Allow 2 extra sessions for privileged TAs
-  
+
   const availableTas = privTas.filter(
-    (ta) => tasSessionCount[ta] < maxForPrivTas && !tasAssignedForSession.includes(ta)
+    (ta) =>
+      tasSessionCount[ta] < maxForPrivTas && !tasAssignedForSession.includes(ta)
   );
 
   if (availableTas.length === 0) return null;
@@ -101,13 +104,13 @@ function scheduleTas(examsSchedule, tasList) {
     sessions.forEach((session) => {
       // Reset tasAssignedForSession for each session, not each day
       const tasAssignedForSession = [];
-      
+
       tasSchedule[day][session] = {};
       const rooms = Object.keys(examsSchedule[day][session]);
 
       rooms.forEach((room) => {
         tasSchedule[day][session][room] = [];
-        
+
         if (roomsWith2Tas.includes(room)) {
           // Assign first TA
           const ta1 = getAvailableTa(
@@ -116,20 +119,26 @@ function scheduleTas(examsSchedule, tasList) {
             MaxSessionsPerTa,
             tasAssignedForSession
           );
-          
+
           if (ta1) {
             tasSchedule[day][session][room].push(ta1);
             tasSessionCount[ta1] += 1;
             tasAssignedForSession.push(ta1);
           } else {
-            const privTa = getPrivTa(tasSessionCount, tasAssignedForSession, MaxSessionsPerTa);
+            const privTa = getPrivTa(
+              tasSessionCount,
+              tasAssignedForSession,
+              MaxSessionsPerTa
+            );
             if (privTa) {
               tasSchedule[day][session][room].push(privTa);
               tasSessionCount[privTa] += 1;
               tasAssignedForSession.push(privTa);
             } else {
               const randomTa = getRandomTa(
-                shuffledTasList.filter((ta) => !tasAssignedForSession.includes(ta))
+                shuffledTasList.filter(
+                  (ta) => !tasAssignedForSession.includes(ta)
+                )
               );
               if (randomTa) {
                 tasSchedule[day][session][room].push(randomTa);
@@ -146,20 +155,26 @@ function scheduleTas(examsSchedule, tasList) {
             MaxSessionsPerTa,
             tasAssignedForSession
           );
-          
+
           if (ta2) {
             tasSchedule[day][session][room].push(ta2);
             tasSessionCount[ta2] += 1;
             tasAssignedForSession.push(ta2);
           } else {
-            const privTa = getPrivTa(tasSessionCount, tasAssignedForSession, MaxSessionsPerTa);
+            const privTa = getPrivTa(
+              tasSessionCount,
+              tasAssignedForSession,
+              MaxSessionsPerTa
+            );
             if (privTa) {
               tasSchedule[day][session][room].push(privTa);
               tasSessionCount[privTa] += 1;
               tasAssignedForSession.push(privTa);
             } else {
               const randomTa = getRandomTa(
-                shuffledTasList.filter((ta) => !tasAssignedForSession.includes(ta))
+                shuffledTasList.filter(
+                  (ta) => !tasAssignedForSession.includes(ta)
+                )
               );
               if (randomTa) {
                 tasSchedule[day][session][room].push(randomTa);
@@ -182,14 +197,20 @@ function scheduleTas(examsSchedule, tasList) {
             tasSessionCount[ta] += 1;
             tasAssignedForSession.push(ta);
           } else {
-            const privTa = getPrivTa(tasSessionCount, tasAssignedForSession, MaxSessionsPerTa);
+            const privTa = getPrivTa(
+              tasSessionCount,
+              tasAssignedForSession,
+              MaxSessionsPerTa
+            );
             if (privTa) {
               tasSchedule[day][session][room].push(privTa);
               tasSessionCount[privTa] += 1;
               tasAssignedForSession.push(privTa);
             } else {
               const randomTa = getRandomTa(
-                shuffledTasList.filter((ta) => !tasAssignedForSession.includes(ta))
+                shuffledTasList.filter(
+                  (ta) => !tasAssignedForSession.includes(ta)
+                )
               );
               if (randomTa) {
                 tasSchedule[day][session][room].push(randomTa);
@@ -208,105 +229,14 @@ function scheduleTas(examsSchedule, tasList) {
 
 const [tasSchedule, tasSessionCount] = scheduleTas(examsSchedule, tasList);
 
-// Verification and logging
-// function verifyScheduling(tasSchedule, tasSessionCount, examsSchedule) {
-//   const totalSessions = getTotalNumOfSessions(examsSchedule);
-//   const averageSessionsPerTa = getAverageSessionsPerTa(examsSchedule, tasList);
-  
-//   // Count total assignments
-//   let totalAssignments = 0;
-//   let unassignedSessions = 0;
-  
-//   const days = Object.keys(tasSchedule);
-//   days.forEach((day) => {
-//     const sessions = Object.keys(tasSchedule[day]);
-//     sessions.forEach((session) => {
-//       const rooms = Object.keys(tasSchedule[day][session]);
-//       rooms.forEach((room) => {
-//         const assignments = tasSchedule[day][session][room];
-//         if (assignments.length === 0) {
-//           unassignedSessions++;
-//           console.log(`⚠️  Unassigned: ${day} - ${session} - ${room}`);
-//         } else {
-//           totalAssignments += assignments.length;
-//           // Check for null assignments
-//           assignments.forEach((ta, index) => {
-//             if (!ta) {
-//               console.log(`⚠️  Null assignment: ${day} - ${session} - ${room} - Position ${index + 1}`);
-//             }
-//           });
-//         }
-//       });
-//     });
-//   });
-  
-//   // console.log("\n=== SCHEDULING VERIFICATION ===");
-//   // console.log(`Total sessions required: ${totalSessions}`);
-//   // console.log(`Total assignments made: ${totalAssignments}`);
-//   // console.log(`Unassigned sessions: ${unassignedSessions}`);
-//   // console.log(`Missing assignments: ${totalSessions - totalAssignments}`);
-  
-//   if (totalAssignments === totalSessions) {
-//     console.log("✅ All sessions have been assigned!");
-//   } else {
-//     console.log("❌ Some sessions are missing assignments!");
-//   }
-  
-//   // Check TAs with less than average sessions
-//   // console.log(`\n=== TA SESSION DISTRIBUTION ===`);
-//   // console.log(`Average sessions per TA: ${averageSessionsPerTa}`);
-  
-//   const belowAverage = [];
-//   const aboveAverage = [];
-//   const atAverage = [];
-  
-//   Object.keys(tasSessionCount).forEach((ta) => {
-//     const sessions = tasSessionCount[ta];
-//     if (sessions < averageSessionsPerTa) {
-//       belowAverage.push({ ta, sessions });
-//     } else if (sessions > averageSessionsPerTa) {
-//       aboveAverage.push({ ta, sessions });
-//     } else {
-//       atAverage.push({ ta, sessions });
-//     }
-//   });
-  
-//   console.log(`\nTAs with LESS than average (${averageSessionsPerTa}) sessions:`);
-//   belowAverage.sort((a, b) => a.sessions - b.sessions);
-//   belowAverage.forEach(({ ta, sessions }) => {
-//     console.log(`  ${ta}: ${sessions} sessions (${averageSessionsPerTa - sessions} below average)`);
-//   });
-  
-//   console.log(`\nTAs with MORE than average (${averageSessionsPerTa}) sessions:`);
-//   aboveAverage.sort((a, b) => b.sessions - a.sessions);
-//   aboveAverage.forEach(({ ta, sessions }) => {
-//     console.log(`  ${ta}: ${sessions} sessions (+${sessions - averageSessionsPerTa} above average)`);
-//   });
-  
-//   console.log(`\nTAs at exactly average (${averageSessionsPerTa}) sessions: ${atAverage.length}`);
-  
-//   // Summary statistics
-//   const totalTAsAssigned = Object.keys(tasSessionCount).filter(ta => tasSessionCount[ta] > 0).length;
-//   const totalTAsAvailable = Object.keys(tasSessionCount).length;
-  
-//   console.log(`\n=== SUMMARY ===`);
-//   console.log(`Total TAs available: ${totalTAsAvailable}`);
-//   console.log(`Total TAs assigned: ${totalTAsAssigned}`);
-//   console.log(`TAs below average: ${belowAverage.length}`);
-//   console.log(`TAs at average: ${atAverage.length}`);
-//   console.log(`TAs above average: ${aboveAverage.length}`);
-//   console.log(`Unused TAs: ${totalTAsAvailable - totalTAsAssigned}`);
-// }
-
-// verifyScheduling(tasSchedule, tasSessionCount, examsSchedule);
-
 function saveTaScheduleToXLSX() {
   const tasSchedule = require("./outputs/tas_schedule.json");
-  const tasSessionCount = require('./outputs/tas_session_count.json')
+  const tasSessionCount = require("./outputs/tas_session_count.json");
   const ExcelJS = require("exceljs");
   const fs = require("fs");
 
   const tasScheduleList = [];
+  const tasSessionCountList = []
 
   const days = Object.keys(tasSchedule);
   days.forEach((day) => {
@@ -328,11 +258,18 @@ function saveTaScheduleToXLSX() {
     });
   });
 
+  const names = Object.keys(tasSessionCount);
+  names.forEach((name) => {
+    const sessionCount = { name, count: tasSessionCount[name] };
+
+    tasSessionCountList.push(sessionCount)
+  });
+
   const wb = new ExcelJS.Workbook();
   const sheet1 = wb.addWorksheet("Sheet1");
-  const sheet2 = wb.addWorksheet("Sessions")
+  const sheet2 = wb.addWorksheet("Session Count");
   sheet1.columns = [
-    { header: "Room", key: "room", width: 32 },
+    { header: "Room", key: "room", width: 20 },
     { header: "Teaching Assistant", key: "teachingAssistant", width: 72 },
     { header: "Date", key: "date", width: 50 },
     { header: "Session", key: "session", width: 50 },
@@ -340,10 +277,10 @@ function saveTaScheduleToXLSX() {
   sheet1.addRows(tasScheduleList);
 
   sheet2.columns = [
-    { header: "Teaching Assistant", key: "teachingAssistant", width: 72 },
-    { header: "Number of Sessions", key: "sessions", width: 25 },
-  ]
-  sheet2.addRows(tasSessionCount)
+    { header: "Teaching Assistant", key: "name", width: 72 },
+    { header: "Number of Sessions", key: "count", width: 20 },
+  ];
+  sheet2.addRows(tasSessionCountList);
 
   wb.xlsx
     .writeFile("./src/outputs/ta_schedule.xlsx")
@@ -360,13 +297,10 @@ function saveTaScheduleToXLSX() {
   );
 }
 
-const fs = require("fs");
-
-fs.writeFileSync("./src/outputs/tas_schedule.json", JSON.stringify(tasSchedule));
-fs.writeFileSync(
-  "./src/outputs/tas_session_count.json",
-  JSON.stringify(tasSessionCount)
-);
+// fs.writeFileSync("./src/outputs/tas_schedule.json", JSON.stringify(tasSchedule));
+// fs.writeFileSync(
+//   "./src/outputs/tas_session_count.json",
+//   JSON.stringify(tasSessionCount)
+// );
 
 saveTaScheduleToXLSX();
-// verifyScheduling()
